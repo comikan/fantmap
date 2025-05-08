@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fantasy Map Generator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .controls {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .control-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    input {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+      min-width: 300px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    button:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+    #map-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    #map-image {
+      max-width: 100%;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    #loading {
+      display: none;
+      padding: 20px;
+      text-align: center;
+      font-size: 18px;
+      color: #7f8c8d;
+    }
+    .map-info {
+      margin-top: 15px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .seed-display {
+      font-family: monospace;
+      color: #e74c3c;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Fantasy Map Generator</h1>
+  
+  <div class="controls">
+    <div class="control-group">
+      <input type="text" id="seed-input" placeholder="Enter seed or leave blank for random">
+      <button id="generate-btn">Generate Map</button>
+      <button id="random-btn">Random Seed</button>
+    </div>
+    <div class="control-group">
+      <button id="download-btn" disabled>Download Map</button>
+    </div>
+  </div>
+  
+  <div id="loading">Generating map...</div>
+  
+  <div id="map-container">
+    <p>Click "Generate Map" to create your first map</p>
+    <img id="map-image" style="display: none;">
+    <div id="map-info" class="map-info" style="display: none;">
+      Seed: <span class="seed-display" id="current-seed"></span>
+    </div>
+  </div>
+
+  <script>
+    // DOM elements
+    const seedInput = document.getElementById('seed-input');
+    const generateBtn = document.getElementById('generate-btn');
+    const randomBtn = document.getElementById('random-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    const loadingEl = document.getElementById('loading');
+    const mapImage = document.getElementById('map-image');
+    const mapContainer = document.getElementById('map-container');
+    const mapInfo = document.getElementById('map-info');
+    const currentSeed = document.getElementById('current-seed');
+
+    // Generate a random seed
+    function generateRandomSeed() {
+      return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    }
+
+    // Generate map function
+    function generateMap() {
+      const seed = seedInput.value.trim() || generateRandomSeed();
+      
+      // Show loading state
+      loadingEl.style.display = 'block';
+      mapImage.style.display = 'none';
+      mapInfo.style.display = 'none';
+      downloadBtn.disabled = true;
+      
+      // Generate the map
+      mapImage.onload = function() {
+        loadingEl.style.display = 'none';
+        mapImage.style.display = 'block';
+        mapInfo.style.display = 'block';
+        downloadBtn.disabled = false;
+        currentSeed.textContent = seed;
+      };
+      
+      mapImage.src = `/api/generate-map?seed=${encodeURIComponent(seed)}&t=${Date.now()}`;
+    }
+
+    // Event listeners
+    generateBtn.addEventListener('click', generateMap);
+    
+    randomBtn.addEventListener('click', () => {
+      seedInput.value = generateRandomSeed();
+    });
+    
+    downloadBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.href = mapImage.src;
+      link.download = `fantasy-map-${currentSeed.textContent}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+    
+    // Allow generating with Enter key
+    seedInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        generateMap();
+      }
+    });
+  </script>
+</body>
+</html>

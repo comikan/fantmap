@@ -1,0 +1,29 @@
+{
+  "name": "fantmap",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "generate-example": "node examples/basic-usage.js",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "fantasy",
+    "map",
+    "generator",
+    "2d"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "canvas": "^3.1.0",
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "@turf/turf": "^7.2.0",
+    "fantasy-name-generator": "^2.0.0",
+    "seedrandom": "^3.0.5"
+  }
+}
